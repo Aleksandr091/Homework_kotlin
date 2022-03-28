@@ -1,5 +1,5 @@
 package ru.chistov.homework
 
-data class Note(val title: String, val description: String) {
+data class Note(var title: String, val description: String) {
 
 }
