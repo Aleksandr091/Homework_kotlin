@@ -3,9 +3,7 @@ package ru.chistov.homework.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.chistov.homework.repository.Repository
 import ru.chistov.homework.repository.RepositoryImpl
-import java.lang.Thread.sleep
 
 class MainViewModel(private val liveData: MutableLiveData<AppState> = MutableLiveData(), private val repository: RepositoryImpl = RepositoryImpl()) : ViewModel() {
 
@@ -13,13 +11,17 @@ class MainViewModel(private val liveData: MutableLiveData<AppState> = MutableLiv
         return liveData
     }
 
-    fun getWeather() {
+    fun getWeatherRussian() = getWeather(true)
+
+    fun getWeatherWorld() = getWeather(false)
+
+    private fun getWeather(isRussian: Boolean) {
         Thread {
             liveData.postValue(AppState.Loading)
-            if ((0..10).random() > 5)
-                liveData.postValue(AppState.Success(repository.getWeatherFromServer()))
-            else
-                liveData.postValue(AppState.Error(IllegalAccessError()))
+
+            val answer = if (isRussian) repository.getRussianWeatherFromLocalStorage()
+            else repository.getWorldWeatherFromLocalStorage()
+            liveData.postValue(AppState.Success(answer))
         }.start()
     }
 }
