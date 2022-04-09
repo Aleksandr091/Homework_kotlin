@@ -44,14 +44,10 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.recyclerView.adapter = adapter
+        initRecycler()
 
         val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        val observer = object : Observer<AppState> {
-            override fun onChanged(data: AppState) {
-                renderData(data, view)
-            }
-        }
+        val observer = Observer<AppState> { data -> renderData(data, view) }
         viewModel.getData().observe(viewLifecycleOwner, observer)
 
         binding.floatingActionButton.setOnClickListener {
@@ -69,6 +65,9 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
             }
         }
         viewModel.getWeatherRussian()
+    }
+    fun initRecycler(){
+        binding.recyclerView.adapter = adapter
     }
 
     private fun renderData(data: AppState, view: View) {
