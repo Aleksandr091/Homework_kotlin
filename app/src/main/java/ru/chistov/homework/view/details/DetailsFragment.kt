@@ -58,7 +58,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun View.showSnackBar(it: String) {
-        Snackbar.make(binding.mainView, it, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(this, it, Snackbar.LENGTH_SHORT).show()
     }
 
     companion object {
