@@ -12,16 +12,22 @@ import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
 import ru.chistov.homework.view.MainActivity
 import ru.chistov.homework.view.details.DetailsFragment
 
-class WeatherListAdapter(private val onItemClickListener: OnItemClickListener,
-        private var data:List<Weather> = listOf()):RecyclerView.Adapter<WeatherListAdapter.CityHolder>() {
+class WeatherListAdapter(
+    private val onItemClickListener: OnItemClickListener,
+    private var data: List<Weather> = listOf()
+) : RecyclerView.Adapter<WeatherListAdapter.CityHolder>() {
 
-    fun setData(dataNew:List<Weather>){
+    fun setData(dataNew: List<Weather>) {
         this.data = dataNew
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityHolder {
-        val binding = FragmentWeatherListRecyclerItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val binding = FragmentWeatherListRecyclerItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return CityHolder(binding.root)
     }
 
@@ -29,16 +35,16 @@ class WeatherListAdapter(private val onItemClickListener: OnItemClickListener,
         holder.bind(data[position])
     }
 
-    override fun getItemCount()=data.size
+    override fun getItemCount() = data.size
 
-    inner class CityHolder(itemView:View):RecyclerView.ViewHolder(itemView){
-        fun bind(weather: Weather){
-            val binding = FragmentWeatherListRecyclerItemBinding.bind(itemView)
-            binding.tvCityName.text = weather.city.name
-            val bundle = Bundle()
-            bundle.putParcelable(KEY_BUNDLE_WEATHER,weather)
-            binding.root.setOnClickListener{
-                onItemClickListener.onItemClick(weather)}
+    inner class CityHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(weather: Weather) {
+            FragmentWeatherListRecyclerItemBinding.bind(itemView).apply {
+                tvCityName.text = weather.city.name
+                root.setOnClickListener {
+                    onItemClickListener.onItemClick(weather)
+                }
+            }
 
 
         }

@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_details.*
+import kotlinx.android.synthetic.main.fragment_details.view.*
 import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentDetailsBinding
 import ru.chistov.homework.repository.Weather
@@ -38,19 +40,25 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weather: Weather = requireArguments().getParcelable<Weather>(KEY_BUNDLE_WEATHER)!!
-        renderData(weather)
+        arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let { renderData(it) }
     }
 
     private fun renderData(weather: Weather) {
-        binding.loadingLayout.visibility = View.GONE
-        binding.cityName.text = weather.city.name
-        binding.temperatureValue.text = weather.temperature.toString()
-        binding.feelsLikeValue.text = weather.feelsLike.toString()
-        binding.cityCoordinates.text = "${weather.city.lat} ${weather.city.lon}"
+        with(binding) {
+            loadingLayout.visibility = View.GONE
+            with(weather) {
+                cityName.text = city.name
+                temperatureValue.text = temperature.toString()
+                feelsLikeValue.text = feelsLike.toString()
+                cityCoordinates.text = "${city.lat} ${city.lon}"
+            }
+        }
+        //Snackbar.make(binding.mainView, "работает", Snackbar.LENGTH_SHORT).show()
+        mainView.showSnackBar("работает")
+    }
 
-        //binding.message.text = "Получилось"
-        Snackbar.make(binding.mainView, "работает", Snackbar.LENGTH_SHORT).show()
+    private fun View.showSnackBar(it: String) {
+        Snackbar.make(binding.mainView, it, Snackbar.LENGTH_SHORT).show()
     }
 
     companion object {

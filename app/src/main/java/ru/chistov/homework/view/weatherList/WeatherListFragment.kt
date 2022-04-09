@@ -18,7 +18,7 @@ import ru.chistov.homework.viewmodel.AppState
 import ru.chistov.homework.viewmodel.MainViewModel
 
 
-class WeatherListFragment : Fragment(),OnItemClickListener {
+class WeatherListFragment : Fragment(), OnItemClickListener {
 
     private var _binding: FragmentWeatherListBinding? = null
     private val binding: FragmentWeatherListBinding
@@ -32,8 +32,10 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
         _binding = null
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentWeatherListBinding.inflate(inflater, container, false)
         //return inflater.inflate(R.layout.fragment_main, container, false)
@@ -54,19 +56,26 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
             isRussian = !isRussian
             if (isRussian) {
                 viewModel.getWeatherRussian()
-                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_russia))
+                binding.floatingActionButton.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_russia
+                    )
+                )
             } else {
                 viewModel.getWeatherWorld()
-                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_earth))
+                binding.floatingActionButton.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_earth
+                    )
+                )
             }
         }
         viewModel.getWeatherRussian()
     }
-    fun initRecycler(){
+
+    private fun initRecycler() {
         binding.recyclerView.adapter = adapter
     }
 
@@ -74,10 +83,13 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
         when (data) {
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                /*binding.message.text = "Не получилось ${data.error}"
-                Snackbar.make(requireContext(),view,"Не получилось",Snackbar.LENGTH_SHORT).setAction("попробовать еще раз",View.OnClickListener {
-                    ViewModelProvider(this).get(MainViewModel::class.java).getWeather()
-                }).show()*/
+                Snackbar.make(binding.root, "Не получилось", Snackbar.LENGTH_SHORT)
+                    .setAction("попробовать еще раз", View.OnClickListener {
+                        if (isRussian) ViewModelProvider(this).get(MainViewModel::class.java)
+                            .getWeatherRussian()
+                        else ViewModelProvider(this).get(MainViewModel::class.java)
+                            .getWeatherWorld()
+                    }).show()
             }
             is AppState.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
@@ -85,13 +97,6 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
             is AppState.Success -> {
                 binding.loadingLayout.visibility = View.GONE
                 adapter.setData(data.weatherListData)
-                /*binding.cityName.text=data.weatherData.city.name
-                binding.temperatureValue.text=data.weatherData.temperature.toString()
-                binding.feelsLikeValue.text=data.weatherData.feelsLike.toString()
-                binding.cityCoordinates.text="${data.weatherData.city.lat} ${data.weatherData.city.lon}"
-
-                //binding.message.text = "Получилось"
-                Snackbar.make(requireContext(),view,"работает",Snackbar.LENGTH_SHORT).show()*/
             }
         }
     }
@@ -99,13 +104,19 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
     companion object {
         @JvmStatic
         fun newInstance() =
-                WeatherListFragment()
+            WeatherListFragment()
     }
-    override fun onItemClick(weather: Weather) {
-        val bundle = Bundle()
-        bundle.putParcelable(KEY_BUNDLE_WEATHER,weather)
 
-            requireActivity().supportFragmentManager.beginTransaction().add(R.id.container,DetailsFragment.newInstance(bundle)).addToBackStack("").commit()
+    override fun onItemClick(weather: Weather) {
+        requireActivity().supportFragmentManager.beginTransaction().add(
+            R.id.container,
+            DetailsFragment.newInstance(Bundle().apply {
+                putParcelable(
+                    KEY_BUNDLE_WEATHER,
+                    weather
+                )
+            })
+        ).addToBackStack("").commit()
 
 
     }

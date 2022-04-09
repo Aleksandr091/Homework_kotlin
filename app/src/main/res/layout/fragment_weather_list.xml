@@ -17,10 +17,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/margin_15_dp"
-        app:maxImageSize="56dp"
-        app:tint="@null"
         android:src="@drawable/ic_russia"
-         />
+        app:maxImageSize="56dp"
+        app:tint="@null" />
 
     <FrameLayout
         android:id="@+id/loadingLayout"
