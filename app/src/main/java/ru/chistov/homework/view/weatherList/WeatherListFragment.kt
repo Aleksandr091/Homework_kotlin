@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -24,7 +25,7 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
         get() {
             return _binding!!
         }
-    val adapter = WeatherListAdapter(this)
+    private val adapter = WeatherListAdapter(this)
 
     override fun onDestroy() {
         super.onDestroy()
@@ -57,8 +58,14 @@ class WeatherListFragment : Fragment(),OnItemClickListener {
             isRussian = !isRussian
             if (isRussian) {
                 viewModel.getWeatherRussian()
+                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_russia))
             } else {
                 viewModel.getWeatherWorld()
+                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_earth))
             }
         }
         viewModel.getWeatherRussian()
