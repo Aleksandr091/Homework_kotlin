@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.chistov.homework.repository.RepositoryImpl
 
-class MainViewModel(private val liveData: MutableLiveData<AppState> = MutableLiveData(), private val repository: RepositoryImpl = RepositoryImpl()) : ViewModel() {
+class MainViewModel(
+    private val liveData: MutableLiveData<AppState> = MutableLiveData(),
+    private val repository: RepositoryImpl = RepositoryImpl()
+) : ViewModel() {
 
     fun getData(): LiveData<AppState> {
         return liveData

@@ -1,11 +1,11 @@
 package ru.chistov.homework.view.weatherList
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -44,14 +44,21 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
 
     var isRussian: Boolean = true
 
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler()
 
-        val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         val observer = Observer<AppState> { data -> renderData(data, view) }
         viewModel.getData().observe(viewLifecycleOwner, observer)
+        setFloatingActionButton()
+        viewModel.getWeatherRussian()
+    }
 
+    private fun setFloatingActionButton() {
         binding.floatingActionButton.setOnClickListener {
             isRussian = !isRussian
             if (isRussian) {
@@ -72,7 +79,6 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                 )
             }
         }
-        viewModel.getWeatherRussian()
     }
 
     private fun initRecycler() {
@@ -85,10 +91,8 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                 binding.loadingLayout.visibility = View.GONE
                 Snackbar.make(binding.root, "Не получилось", Snackbar.LENGTH_SHORT)
                     .setAction("попробовать еще раз", View.OnClickListener {
-                        if (isRussian) ViewModelProvider(this).get(MainViewModel::class.java)
-                            .getWeatherRussian()
-                        else ViewModelProvider(this).get(MainViewModel::class.java)
-                            .getWeatherWorld()
+                        if (isRussian) viewModel.getWeatherRussian()
+                        else viewModel.getWeatherWorld()
                     }).show()
             }
             is AppState.Loading -> {

@@ -1,19 +1,15 @@
 package ru.chistov.homework.view.details
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_details.*
-import kotlinx.android.synthetic.main.fragment_details.view.*
-import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentDetailsBinding
 import ru.chistov.homework.repository.Weather
 import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
-import ru.chistov.homework.view.MainActivity
-import ru.chistov.homework.view.weatherList.OnItemClickListener
 
 
 class DetailsFragment : Fragment() {

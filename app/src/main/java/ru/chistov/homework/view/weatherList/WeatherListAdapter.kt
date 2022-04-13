@@ -1,16 +1,11 @@
 package ru.chistov.homework.view.weatherList
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentWeatherListRecyclerItemBinding
 import ru.chistov.homework.repository.Weather
-import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
-import ru.chistov.homework.view.MainActivity
-import ru.chistov.homework.view.details.DetailsFragment
 
 class WeatherListAdapter(
     private val onItemClickListener: OnItemClickListener,
@@ -40,10 +35,13 @@ class WeatherListAdapter(
     inner class CityHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(weather: Weather) {
             FragmentWeatherListRecyclerItemBinding.bind(itemView).apply {
-                tvCityName.text = weather.city.name
-                root.setOnClickListener {
-                    onItemClickListener.onItemClick(weather)
+                with(weather){
+                    tvCityName.text = city.name
+                    root.setOnClickListener {
+                        onItemClickListener.onItemClick(this)
+                    }
                 }
+
             }
 
 
