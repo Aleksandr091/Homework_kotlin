@@ -8,11 +8,12 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_details.*
 import ru.chistov.homework.databinding.FragmentDetailsBinding
-import ru.chistov.homework.repository.Weather
+import ru.chistov.homework.repository.*
 import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
+import ru.chistov.homework.viewmodel.AppErrorState
 
 
-class DetailsFragment : Fragment() {
+class DetailsFragment : Fragment(),OnServerResponse,OnErrorListener {
 
     private var _binding: FragmentDetailsBinding? = null
     private val binding: FragmentDetailsBinding
@@ -33,20 +34,24 @@ class DetailsFragment : Fragment() {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
-
+    lateinit var currentCityName:String
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let { renderData(it) }
+        arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let{
+            currentCityName =it.city.name
+            WeatherLoader(this@DetailsFragment,this@DetailsFragment).loadWeather(it.city.lat,it.city.lon)
+
+        }
     }
 
-    private fun renderData(weather: Weather) {
+    private fun renderData(weather: WeatherDTO) {
         with(binding) {
             loadingLayout.visibility = View.GONE
             with(weather) {
-                cityName.text = city.name
-                temperatureValue.text = temperature.toString()
-                feelsLikeValue.text = feelsLike.toString()
-                cityCoordinates.text = "${city.lat} ${city.lon}"
+                cityName.text = currentCityName
+                temperatureValue.text = factDTO.temperature.toString()
+                feelsLikeValue.text = factDTO.feelsLike.toString()
+                cityCoordinates.text = "${infoDTO.lat} ${infoDTO.lon}"
             }
         }
         //Snackbar.make(binding.mainView, "работает", Snackbar.LENGTH_SHORT).show()
@@ -64,6 +69,14 @@ class DetailsFragment : Fragment() {
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    override fun onResponse(weatherDTO: WeatherDTO) {
+        renderData(weatherDTO)
+    }
+
+    override fun onError(error: String) {
+        mainView.showSnackBar(error)
     }
 
 }
