@@ -1,9 +1,12 @@
-package ru.chistov.homework.repository
+package ru.chistov.homework.repository.dto
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
-data class FactDTO(
+@Parcelize
+data class PartDTO(
     @SerializedName("condition")
     val condition: String,
     @SerializedName("daytime")
@@ -14,22 +17,30 @@ data class FactDTO(
     val humidity: Int,
     @SerializedName("icon")
     val icon: String,
-    @SerializedName("obs_time")
-    val obsTime: Int,
+    @SerializedName("part_name")
+    val partName: String,
     @SerializedName("polar")
     val polar: Boolean,
+    @SerializedName("prec_mm")
+    val precMm: Double,
+    @SerializedName("prec_period")
+    val precPeriod: Int,
+    @SerializedName("prec_prob")
+    val precProb: Int,
     @SerializedName("pressure_mm")
     val pressureMm: Int,
     @SerializedName("pressure_pa")
     val pressurePa: Int,
-    @SerializedName("season")
-    val season: String,
-    @SerializedName("temp")
-    val temperature: Int,
+    @SerializedName("temp_avg")
+    val tempAvg: Int,
+    @SerializedName("temp_max")
+    val tempMax: Int,
+    @SerializedName("temp_min")
+    val tempMin: Int,
     @SerializedName("wind_dir")
     val windDir: String,
     @SerializedName("wind_gust")
     val windGust: Double,
     @SerializedName("wind_speed")
     val windSpeed: Double
-)
+): Parcelable

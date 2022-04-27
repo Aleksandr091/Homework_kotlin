@@ -1,5 +1,9 @@
 package ru.chistov.homework.view.details
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +12,15 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_details.*
 import ru.chistov.homework.databinding.FragmentDetailsBinding
-import ru.chistov.homework.repository.*
-import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
-import ru.chistov.homework.viewmodel.AppErrorState
+import ru.chistov.homework.repository.OnErrorListener
+import ru.chistov.homework.repository.OnServerResponse
+import ru.chistov.homework.repository.Weather
+import ru.chistov.homework.repository.WeatherLoader
+import ru.chistov.homework.repository.dto.WeatherDTO
+import ru.chistov.homework.utils.*
 
 
-class DetailsFragment : Fragment(),OnServerResponse,OnErrorListener {
+class DetailsFragment : Fragment(), OnServerResponse, OnErrorListener {
 
     private var _binding: FragmentDetailsBinding? = null
     private val binding: FragmentDetailsBinding
@@ -24,6 +31,7 @@ class DetailsFragment : Fragment(),OnServerResponse,OnErrorListener {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        requireContext().unregisterReceiver(receiver)
     }
 
     override fun onCreateView(
@@ -34,12 +42,32 @@ class DetailsFragment : Fragment(),OnServerResponse,OnErrorListener {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
-    lateinit var currentCityName:String
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            p1?.let {
+                p1.getParcelableExtra<WeatherDTO>(KEY_BUNDLE_SERVICE_BROADCAST_WEATHER)
+                    ?.let { onResponse(it) }
+            }
+        }
+    }
+
+    lateinit var currentCityName: String
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let{
-            currentCityName =it.city.name
-            WeatherLoader(this@DetailsFragment,this@DetailsFragment).loadWeather(it.city.lat,it.city.lon)
+
+        requireContext().registerReceiver(receiver, IntentFilter(
+            KEY_WAVE
+        ))
+
+        arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let {
+            currentCityName = it.city.name
+           /* WeatherLoader(this@DetailsFragment, this@DetailsFragment).loadWeather(
+                it.city.lat,
+                it.city.lon
+            )*/
+            requireActivity().startService(Intent(requireContext(),DetailsService::class.java).apply { putExtra(
+                KEY_BUNDLE_LAT,it.city.lat)
+            putExtra(KEY_BUNDLE_LON,it.city.lon)})
 
         }
     }
@@ -78,5 +106,6 @@ class DetailsFragment : Fragment(),OnServerResponse,OnErrorListener {
     override fun onError(error: String) {
         mainView.showSnackBar(error)
     }
+
 
 }

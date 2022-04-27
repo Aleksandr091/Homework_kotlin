@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ru.chistov.homework">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -21,6 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".view.details.DetailsService" />
+        <service android:name=".lesson6.MyService"/>
+        <receiver android:name=".lesson6.MyBroadcastReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.AIRPLANE_MODE" />
+                <action android:name="myaction"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
