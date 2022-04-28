@@ -15,7 +15,6 @@ import java.net.URL
 
 class DetailsService(val name: String = "") :
     IntentService(name) {
-    private lateinit var onErrorListener: OnErrorListener
     override fun onHandleIntent(p0: Intent?) {
         p0?.let {
             val lat = it.getDoubleExtra(KEY_BUNDLE_LAT, 0.0)
@@ -40,10 +39,18 @@ class DetailsService(val name: String = "") :
 
                 when (responseCode) {
                     in serverside -> {
-                        onErrorListener.onError("ошибка сервера " + urlConnection.responseMessage)
+                        val errorSS = "ошибка сервера " + urlConnection.responseMessage
+                        val messageErrorServerside = Intent(KEY_WAVE)
+                        messageErrorServerside.putExtra(KEY_MESSAGE_ERROR_SERVERSIDE, errorSS)
+                        sendBroadcast(messageErrorServerside)
+
                     }
                     in clientside -> {
-                        onErrorListener.onError("у вас какая-то ошибка " + urlConnection.responseMessage)
+                        val errorCS = "у вас какая-то ошибка " + urlConnection.responseMessage
+                        val messageErrorClientside = Intent(KEY_WAVE)
+                        messageErrorClientside.putExtra(KEY_MESSAGE_ERROR_CLIENTSIDE, errorCS)
+                        sendBroadcast(messageErrorClientside)
+
                     }
                     in responseOk -> {
                         val buffer = BufferedReader(InputStreamReader(urlConnection.inputStream))
@@ -52,9 +59,13 @@ class DetailsService(val name: String = "") :
                         message.putExtra(KEY_BUNDLE_SERVICE_BROADCAST_WEATHER, weatherDTO)
                         sendBroadcast(message)
                     }
+                    else -> {}
                 }
             } catch (e: JsonSyntaxException) {
-                onErrorListener.onError(urlConnection.responseMessage)
+                val error = urlConnection.responseMessage
+                val messageError = Intent(KEY_WAVE)
+                messageError.putExtra(KEY_MESSAGE_ERROR, error)
+                sendBroadcast(messageError)
             } finally {
                 urlConnection.disconnect()
             }
@@ -62,4 +73,7 @@ class DetailsService(val name: String = "") :
 
         }
     }
+
+
+
 }

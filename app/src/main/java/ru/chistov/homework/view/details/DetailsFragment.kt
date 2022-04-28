@@ -11,6 +11,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_details.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import ru.chistov.homework.BuildConfig
 import ru.chistov.homework.databinding.FragmentDetailsBinding
 import ru.chistov.homework.repository.OnErrorListener
 import ru.chistov.homework.repository.OnServerResponse
@@ -46,18 +49,30 @@ class DetailsFragment : Fragment(), OnServerResponse, OnErrorListener {
         override fun onReceive(p0: Context?, p1: Intent?) {
             p1?.let {
                 p1.getParcelableExtra<WeatherDTO>(KEY_BUNDLE_SERVICE_BROADCAST_WEATHER)
-                    ?.let { onResponse(it) }
+                    ?.let { onResponse(it)
+                    }
+                p1.getStringExtra(KEY_MESSAGE_ERROR_SERVERSIDE)
+                    ?.let { onError(it) }
+                p1.getStringExtra(KEY_MESSAGE_ERROR_CLIENTSIDE)
+                    ?.let { onError(it) }
+                p1.let {
+                    p1.getStringExtra(KEY_MESSAGE_ERROR)
+                        ?.let { onError(it) }
+                }
+
             }
         }
     }
 
-    lateinit var currentCityName: String
+
+    private lateinit var currentCityName: String
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         requireContext().registerReceiver(receiver, IntentFilter(
             KEY_WAVE
         ))
+
 
         arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let {
             currentCityName = it.city.name
@@ -68,9 +83,20 @@ class DetailsFragment : Fragment(), OnServerResponse, OnErrorListener {
             requireActivity().startService(Intent(requireContext(),DetailsService::class.java).apply { putExtra(
                 KEY_BUNDLE_LAT,it.city.lat)
             putExtra(KEY_BUNDLE_LON,it.city.lon)})
-
+            //getWeather(it.city.lat,it.city.lon)
         }
     }
+
+    /*fun getWeather(lat:Double,lon:Double){
+        binding.loadingLayout.visibility = View.VISIBLE
+        val client = OkHttpClient()
+        val builder = Request.Builder()
+        builder.addHeader(API_KEY,BuildConfig.WEATHER_API_KEY)
+        builder.url("${YANDEX_DOMAIN}${YANDEX_ENDPOINT}lat=$lat&lon=$lon")
+
+        binding.loadingLayout.visibility = View.GONE
+
+    }*/
 
     private fun renderData(weather: WeatherDTO) {
         with(binding) {

@@ -22,7 +22,7 @@ class WeatherLoader(
         val looper = Handler(Looper.getMainLooper())
 
         Thread {
-            //val urlText = "${YANDEX_DOMAIN}${YANDEX_PATH}lat=$lat&lon=$lon"
+            //val urlText = "${YANDEX_DOMAIN}${YANDEX_ENDPOINT}lat=$lat&lon=$lon"
             val urlText = "http://212.86.114.27/v2/informers?lat=$lat&lon=$lon"
             val uri = URL(urlText)
             val urlConnection: HttpURLConnection =
