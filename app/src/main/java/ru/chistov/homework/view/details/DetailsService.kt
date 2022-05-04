@@ -5,7 +5,6 @@ import android.content.Intent
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import ru.chistov.homework.BuildConfig
-import ru.chistov.homework.repository.OnErrorListener
 import ru.chistov.homework.repository.dto.WeatherDTO
 import ru.chistov.homework.utils.*
 import java.io.BufferedReader
@@ -73,7 +72,6 @@ class DetailsService(val name: String = "") :
 
         }
     }
-
 
 
 }

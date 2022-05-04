@@ -56,7 +56,7 @@ class WeatherLoader(
                     }
                 }
             } catch (e: JsonSyntaxException) {
-                looper.post { onErrorListener.onError(urlConnection.responseMessage) }
+                looper.post { onErrorListener.onError(e.message.toString()) }
             } finally {
                 urlConnection.disconnect()
             }

@@ -21,12 +21,13 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, WeatherListFragment.newInstance()).commit()
         }
-        startService(Intent(this,MyService::class.java).apply {
-            putExtra(KEY_BUNDLE_ACTIVITY_MESSAGE,"привет сервис")
+        startService(Intent(this, MyService::class.java).apply {
+            putExtra(KEY_BUNDLE_ACTIVITY_MESSAGE, "привет сервис")
         })
         val receiver = MyBroadcastReceiver()
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("myaction"))
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
         //registerReceiver(receiver, IntentFilter("myaction"))
 
     }
