@@ -6,19 +6,21 @@ import ru.chistov.homework.repository.*
 
 class DetailsViewModel(
     private val liveData: MutableLiveData<DetailsState> = MutableLiveData(),
-    private val repository: DetailsRepository = DetailsRepositoryOkHttpImpl()
+    private val repository: DetailsRepository = DetailsRepositoryRetrofit2Impl(),
+    private val repositoryAdd: DetailsRepositoryAdd = DetailsRepositoryRoomImpl()
 ) : ViewModel() {
     fun getLiveData() = liveData
 
     fun getWeather(city: City) {
         liveData.postValue(DetailsState.Loading)
         repository.getWeatherDetails(city, object : MyCallback {
-            override fun onFailure(message: String) {
-                liveData.postValue(DetailsState.Error(message))
+            override fun onFailure(error: String) {
+                liveData.postValue(DetailsState.Error(error))
             }
 
             override fun onResponse(weather: Weather) {
                 liveData.postValue(DetailsState.Success(weather))
+                repositoryAdd.addWeather(weather)
             }
         })
     }
@@ -28,5 +30,6 @@ class DetailsViewModel(
 
         fun onResponse(weather: Weather)
     }
+
 
 }

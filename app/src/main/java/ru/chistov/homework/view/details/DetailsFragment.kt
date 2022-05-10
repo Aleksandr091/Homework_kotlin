@@ -12,9 +12,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.load
 import coil.request.ImageRequest
-import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details.*
 import ru.chistov.homework.databinding.FragmentDetailsBinding
 import ru.chistov.homework.repository.OnErrorListener
@@ -56,8 +54,10 @@ class DetailsFragment : Fragment(), OnErrorListener {
             override fun onChanged(t: DetailsState) {
                 renderData(t)
             }
-
         })
+
+
+
 
         arguments?.getParcelable<Weather>(KEY_BUNDLE_WEATHER)?.let {
             viewModel.getWeather(it.city)
@@ -100,9 +100,10 @@ class DetailsFragment : Fragment(), OnErrorListener {
 
     private fun renderData(detailsState: DetailsState) {
         when (detailsState) {
-            is DetailsState.Error ->{
+            is DetailsState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                mainView.showSnackBar("${detailsState.error}")}
+                mainView.showSnackBar("${detailsState.error}")
+            }
             DetailsState.Loading ->
                 binding.loadingLayout.visibility = View.VISIBLE
             is DetailsState.Success -> {
@@ -129,7 +130,8 @@ class DetailsFragment : Fragment(), OnErrorListener {
         }
 
     }
-    private fun ImageView.loadSvg(url:String){
+
+    private fun ImageView.loadSvg(url: String) {
         val imageLoader = ImageLoader.Builder(this.context)
             .componentRegistry { add(SvgDecoder(this@loadSvg.context)) }
             .build()

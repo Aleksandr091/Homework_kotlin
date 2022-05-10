@@ -28,8 +28,7 @@
             android:scaleType="centerInside"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerCityIcon"
-            />
+            app:layout_constraintTop_toBottomOf="@id/headerCityIcon" />
 
         <TextView
             android:id="@+id/cityName"

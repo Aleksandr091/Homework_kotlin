@@ -1,5 +1,7 @@
 package ru.chistov.homework.utils
 
+import ru.chistov.homework.domain.room.HistoryEntity
+import ru.chistov.homework.repository.City
 import ru.chistov.homework.repository.Weather
 import ru.chistov.homework.repository.dto.FactDTO
 import ru.chistov.homework.repository.dto.WeatherDTO
@@ -27,4 +29,19 @@ class Utils {
 fun convertDtoToModel(weatherDTO: WeatherDTO): Weather {
     val fact: FactDTO = weatherDTO.factDTO
     return (Weather(getDefaultCity(), fact.temperature, fact.feelsLike, fact.icon))
+}
+
+fun convertWeatherToEntity(weather: Weather): HistoryEntity {
+    return HistoryEntity(0, weather.city.name, weather.temperature, weather.feelsLike, weather.icon)
+}
+
+fun convertHistoryEntityToWeather(entityList: List<HistoryEntity>): List<Weather> {
+    return entityList.map {
+        Weather(
+            City(it.city, 0.0, 0.0),
+            it.temperature,
+            it.feelsLike,
+            it.icon
+        ) // TODO HW было бы здорово научиться хранить в БД lat lon
+    }
 }

@@ -3,12 +3,16 @@ package ru.chistov.homework.view
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import ru.chistov.homework.MyApp
 import ru.chistov.homework.R
 import ru.chistov.homework.lesson6.MyBroadcastReceiver
 import ru.chistov.homework.lesson6.MyService
 import ru.chistov.homework.utils.KEY_BUNDLE_ACTIVITY_MESSAGE
+import ru.chistov.homework.view.historyList.HistoryWeatherListFragment
 import ru.chistov.homework.view.weatherList.WeatherListFragment
 
 
@@ -30,9 +34,25 @@ class MainActivity : AppCompatActivity() {
             .registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
         //registerReceiver(receiver, IntentFilter("myaction"))
 
+        MyApp.getHistoryDao().getAll()
+
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_history -> {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container, HistoryWeatherListFragment.newInstance())
+                    .addToBackStack("").commit()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
 
 

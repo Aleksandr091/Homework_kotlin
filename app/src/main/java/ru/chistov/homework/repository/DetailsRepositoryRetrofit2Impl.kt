@@ -8,12 +8,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.chistov.homework.BuildConfig
 import ru.chistov.homework.repository.dto.WeatherDTO
-import ru.chistov.homework.utils.YANDEX_DOMAIN
 import ru.chistov.homework.utils.YANDEX_DOMAIN_HARD_MODE
 import ru.chistov.homework.utils.convertDtoToModel
 import ru.chistov.homework.viewmodel.DetailsViewModel
 
-class DetailsRepositoryRetrofit2Impl:DetailsRepository {
+class DetailsRepositoryRetrofit2Impl : DetailsRepository {
     override fun getWeatherDetails(city: City, myCallback: DetailsViewModel.MyCallback) {
 
         val weatherAPI = Retrofit.Builder().apply {
@@ -21,22 +20,23 @@ class DetailsRepositoryRetrofit2Impl:DetailsRepository {
             addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
         }.build().create(WeatherAPI::class.java)
 
-            weatherAPI.getWeather(BuildConfig.WEATHER_API_KEY,city.lat,city.lon).enqueue(object :Callback<WeatherDTO>{
+        weatherAPI.getWeather(BuildConfig.WEATHER_API_KEY, city.lat, city.lon)
+            .enqueue(object : Callback<WeatherDTO> {
                 override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
-                    if (response.isSuccessful){
+                    if (response.isSuccessful) {
                         response.body()?.let {
                             val weather = convertDtoToModel(it)
                             weather.city = city
                             myCallback.onResponse(weather)
                         }
-                    }else{
+                    } else {
                         myCallback.onFailure("${response.message()}${response.code()}")
                     }
                 }
 
                 override fun onFailure(call: Call<WeatherDTO>, t: Throwable) {
 
-                    myCallback.onFailure("Что-то пошло не так"+t.message)
+                    myCallback.onFailure("Что-то пошло не так" + t.message)
                 }
 
             })

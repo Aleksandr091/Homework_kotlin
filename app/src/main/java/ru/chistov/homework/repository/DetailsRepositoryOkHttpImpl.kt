@@ -5,7 +5,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.chistov.homework.BuildConfig
 import ru.chistov.homework.repository.dto.WeatherDTO
-import ru.chistov.homework.utils.*
+import ru.chistov.homework.utils.API_KEY
+import ru.chistov.homework.utils.YANDEX_DOMAIN_HARD_MODE
+import ru.chistov.homework.utils.YANDEX_ENDPOINT
+import ru.chistov.homework.utils.convertDtoToModel
 import ru.chistov.homework.viewmodel.DetailsViewModel
 
 class DetailsRepositoryOkHttpImpl : DetailsRepository {
