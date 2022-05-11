@@ -8,18 +8,22 @@ import ru.chistov.homework.viewmodel.HistoryViewModel
 
 class DetailsRepositoryRoomImpl : DetailsRepository, DetailsRepositoryForAll, DetailsRepositoryAdd {
     override fun getWeatherDetails(city: City, myCallback: DetailsViewModel.MyCallback) {
-        val list = convertHistoryEntityToWeather(MyApp.getHistoryDao().getHistoryForCity(city.name))
-        myCallback.onResponse(list.last())
+        Thread{val list = convertHistoryEntityToWeather(
+            MyApp.getHistoryDao().getHistoryForCity(city.name))
+            myCallback.onResponse(list.last())}.start()
 
 
     }
 
     override fun getAllWeatherDetails(myCallback: HistoryViewModel.MyCallbackForAll) {
-        myCallback.onResponse(convertHistoryEntityToWeather(MyApp.getHistoryDao().getAll()))
+        Thread{myCallback.onResponse(convertHistoryEntityToWeather(
+            MyApp.getHistoryDao().getAll()))}.start()
+
     }
 
     override fun addWeather(weather: Weather) {
-        MyApp.getHistoryDao().insert(convertWeatherToEntity(weather))
+        Thread{MyApp.getHistoryDao().insert(convertWeatherToEntity(weather))}.start()
+
     }
 
 }

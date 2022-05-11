@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             .registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
         //registerReceiver(receiver, IntentFilter("myaction"))
 
-        MyApp.getHistoryDao().getAll()
+        Thread{MyApp.getHistoryDao().getAll()}.start()
 
     }
 
