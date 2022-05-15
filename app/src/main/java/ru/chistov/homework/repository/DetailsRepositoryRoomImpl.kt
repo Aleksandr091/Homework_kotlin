@@ -11,19 +11,15 @@ class DetailsRepositoryRoomImpl : DetailsRepository, DetailsRepositoryForAll, De
         Thread{val list = convertHistoryEntityToWeather(
             MyApp.getHistoryDao().getHistoryForCity(city.name))
             myCallback.onResponse(list.last())}.start()
-
-
     }
 
     override fun getAllWeatherDetails(myCallback: HistoryViewModel.MyCallbackForAll) {
         Thread{myCallback.onResponse(convertHistoryEntityToWeather(
             MyApp.getHistoryDao().getAll()))}.start()
-
     }
 
     override fun addWeather(weather: Weather) {
         Thread{MyApp.getHistoryDao().insert(convertWeatherToEntity(weather))}.start()
-
     }
 
 }

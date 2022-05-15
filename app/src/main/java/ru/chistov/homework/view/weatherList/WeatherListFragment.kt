@@ -48,10 +48,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         return binding.root
 
     }
-    /*private var isRussian = requireActivity()
-        .getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
-        .getBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true)*/
-    private var isRussian = true
+
 
 
     private val viewModel: MainViewModel by lazy {
@@ -61,46 +58,62 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler()
-        val observer = Observer<AppState> { data -> renderData(data, view) }
-        viewModel.getData().observe(viewLifecycleOwner, observer)
+        getSP()
+        changeWeatherDataSetImage()
+        if(isRussian){
+            viewModel.getWeatherRussian()
+        }else{
+            viewModel.getWeatherWorld()
+        }
         setFloatingActionButton()
-        viewModel.getWeatherRussian()
+        val observer = Observer<AppState> { data -> renderData(data) }
+        viewModel.getData().observe(viewLifecycleOwner, observer)
+
 
     }
+    private fun getSP() {
+         isRussian = requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
+            .getBoolean(
+                KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true
+            )
+    }
+    private var isRussian=true
 
     private fun setFloatingActionButton() {
-
         binding.floatingActionButton.setOnClickListener {
-
-            isRussian = !isRussian
-            if (isRussian) {
-                viewModel.getWeatherRussian()
-                binding.floatingActionButton.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_russia
-                    )
-                )
-            } else {
-                viewModel.getWeatherWorld()
-                binding.floatingActionButton.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_earth
-                    )
-                )
-            }
+            isRussian=!isRussian
+            changeWeatherDataSetImage()
             requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, isRussian).apply()
         }
 
     }
+    private fun changeWeatherDataSetImage() {
+        if (isRussian) {
+            viewModel.getWeatherRussian()
+            binding.floatingActionButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_russia
+                )
+            )
+        } else {
+            viewModel.getWeatherWorld()
+            binding.floatingActionButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_earth
+                )
+            )
+        }
+    }
+
 
     private fun initRecycler() {
         binding.recyclerView.adapter = adapter
     }
 
-    private fun renderData(data: AppState, view: View) {
+    private fun renderData(data: AppState) {
 
         when (data) {
             is AppState.Error -> {
@@ -116,6 +129,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
             }
             is AppState.Success -> {
                 binding.loadingLayout.visibility = View.GONE
+                getSP()
                 adapter.setData(data.weatherListData)
             }
         }

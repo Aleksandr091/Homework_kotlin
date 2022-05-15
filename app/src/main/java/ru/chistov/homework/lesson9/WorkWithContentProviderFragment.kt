@@ -121,15 +121,15 @@ class WorkWithContentProviderFragment : Fragment() {
                     val columnNameIndex =
                         cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
                     val name: String = cursor.getString(columnNameIndex)
-                    val number = getNumberFromID(contentResolver,name)
+                    //val number = getNumberFromID(contentResolver,name)
 
                     binding.containerForContacts.addView(TextView(requireContext()).apply {
-                        text = "$name:$number" //$number
+                        text = "$name:" //$number
                         textSize = 30f
-                        setOnClickListener {
+                        /*setOnClickListener {
                             numberCurrent =  number
                             makeCall()
-                        }
+                        }*/
                     })
                 }
             }
