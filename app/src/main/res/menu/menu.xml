@@ -6,6 +6,10 @@
         android:id="@+id/action_history"
         android:title="history"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_work_with_content_provider"
+        android:title="WWCP"
+        app:showAsAction="always" />
 
 
 </menu>

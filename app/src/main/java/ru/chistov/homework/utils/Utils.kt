@@ -23,6 +23,7 @@ const val KEY_MESSAGE_ERROR_CLIENTSIDE = "messageErrorClientside"
 const val KEY_MESSAGE_ERROR = "messageError"
 const val KEY_SP_FILE_NAME_1 = "FILE_NAME_1"
 const val KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN = "KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN"
+const val REQUEST_CODE = 89
 
 class Utils {
 

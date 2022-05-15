@@ -30,10 +30,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         }
     private val adapter = WeatherListAdapter(this)
 
-    /*private var isRussian = requireActivity()
-        .getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
-        .getBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true)*/
-    private var isRussian = true
+
 
 
     override fun onDestroy() {
@@ -51,6 +48,10 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         return binding.root
 
     }
+    /*private var isRussian = requireActivity()
+        .getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
+        .getBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true)*/
+    private var isRussian = true
 
 
     private val viewModel: MainViewModel by lazy {

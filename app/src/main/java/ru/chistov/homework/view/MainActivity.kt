@@ -10,6 +10,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ru.chistov.homework.R
 import ru.chistov.homework.lesson6.MyBroadcastReceiver
 import ru.chistov.homework.lesson6.MyService
+import ru.chistov.homework.lesson9.WorkWithContentProviderFragment
 import ru.chistov.homework.utils.KEY_BUNDLE_ACTIVITY_MESSAGE
 import ru.chistov.homework.view.historyList.HistoryWeatherListFragment
 import ru.chistov.homework.view.weatherList.WeatherListFragment
@@ -50,6 +51,15 @@ class MainActivity : AppCompatActivity() {
                 if (fragmentA == null) {
                     supportFragmentManager.beginTransaction().apply {
                         add(R.id.container, HistoryWeatherListFragment.newInstance(), "History")
+                            .addToBackStack("").commit()
+                    }
+                }
+            }
+            R.id.action_work_with_content_provider -> {
+                val fragmentB = supportFragmentManager.findFragmentByTag("WW")
+                if (fragmentB == null) {
+                    supportFragmentManager.beginTransaction().apply {
+                        add(R.id.container, WorkWithContentProviderFragment.newInstance(), "WW")
                             .addToBackStack("").commit()
                     }
                 }
