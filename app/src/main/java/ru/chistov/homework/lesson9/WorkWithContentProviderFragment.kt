@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,8 +92,6 @@ class WorkWithContentProviderFragment : Fragment() {
                     explain()
                 }
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
         if (requestCode == REQUEST_CODE_CALL) {
             for (i in permissions.indices) {
@@ -103,8 +102,13 @@ class WorkWithContentProviderFragment : Fragment() {
                 }
             }
         }
-
+        else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
     }
+
+
+
 
     private fun getContacts() {
         val contentResolver: ContentResolver = requireContext().contentResolver
@@ -118,18 +122,17 @@ class WorkWithContentProviderFragment : Fragment() {
         cursor?.let {
             for (i in 0 until it.count) {
                 if (cursor.moveToPosition(i)) {
-                    val columnNameIndex =
-                        cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                    val columnNameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
                     val name: String = cursor.getString(columnNameIndex)
-                    //val number = getNumberFromID(contentResolver,name)
+                    val number = getNumberFromID(contentResolver,name)
 
                     binding.containerForContacts.addView(TextView(requireContext()).apply {
-                        text = "$name:" //$number
+                        text = "$name:$number" //$number
                         textSize = 30f
-                        /*setOnClickListener {
+                        setOnClickListener {
                             numberCurrent =  number
                             makeCall()
-                        }*/
+                        }
                     })
                 }
             }
@@ -151,18 +154,21 @@ class WorkWithContentProviderFragment : Fragment() {
     }
 
 
-    @SuppressLint("Range")
+
+
     private fun getNumberFromID(cr: ContentResolver, contactId: String) :String {
         val phones = cr.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null
         )
         var number = "none"
-        phones?.let { cursor ->
-            while (cursor.moveToNext()) {
-                number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+        phones?.let {
+            for (i in 0 until phones.count) {
+                if (phones.moveToPosition(i)) {
+                    val columnNameIndex = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    number = phones.getString(columnNameIndex)
+                }
             }
-
         }
         return number
     }
