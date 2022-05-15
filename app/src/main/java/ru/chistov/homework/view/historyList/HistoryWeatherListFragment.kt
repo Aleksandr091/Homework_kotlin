@@ -35,7 +35,7 @@ class HistoryWeatherListFragment : Fragment() {
         return binding.root
     }
 
-    var isRussian: Boolean = true
+
 
     private val viewModel: HistoryViewModel by lazy {
         ViewModelProvider(this).get(HistoryViewModel::class.java)
