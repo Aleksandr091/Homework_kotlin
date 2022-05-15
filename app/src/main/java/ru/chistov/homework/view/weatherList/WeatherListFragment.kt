@@ -1,5 +1,6 @@
 package ru.chistov.homework.view.weatherList
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentWeatherListBinding
 import ru.chistov.homework.repository.Weather
 import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
+import ru.chistov.homework.utils.KEY_SP_FILE_NAME_1
+import ru.chistov.homework.utils.KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN
 import ru.chistov.homework.view.details.DetailsFragment
 import ru.chistov.homework.viewmodel.AppState
 import ru.chistov.homework.viewmodel.MainViewModel
@@ -27,6 +30,12 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         }
     private val adapter = WeatherListAdapter(this)
 
+    /*private var isRussian = requireActivity()
+        .getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
+        .getBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true)*/
+    private var isRussian = true
+
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -40,9 +49,9 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         _binding = FragmentWeatherListBinding.inflate(inflater, container, false)
         //return inflater.inflate(R.layout.fragment_main, container, false)
         return binding.root
+
     }
 
-    var isRussian: Boolean = true
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
@@ -51,15 +60,17 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler()
-
         val observer = Observer<AppState> { data -> renderData(data, view) }
         viewModel.getData().observe(viewLifecycleOwner, observer)
         setFloatingActionButton()
         viewModel.getWeatherRussian()
+
     }
 
     private fun setFloatingActionButton() {
+
         binding.floatingActionButton.setOnClickListener {
+
             isRussian = !isRussian
             if (isRussian) {
                 viewModel.getWeatherRussian()
@@ -78,7 +89,10 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                     )
                 )
             }
+            requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE).edit()
+                .putBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, isRussian).apply()
         }
+
     }
 
     private fun initRecycler() {
@@ -86,6 +100,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     }
 
     private fun renderData(data: AppState, view: View) {
+
         when (data) {
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
@@ -121,7 +136,5 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                 )
             })
         ).addToBackStack("").commit()
-
-
     }
 }

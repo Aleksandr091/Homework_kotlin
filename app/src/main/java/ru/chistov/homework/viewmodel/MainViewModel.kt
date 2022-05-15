@@ -1,9 +1,11 @@
 package ru.chistov.homework.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.chistov.homework.repository.RepositoryImpl
+import ru.chistov.homework.view.MainActivity
 
 class MainViewModel(
     private val liveData: MutableLiveData<AppState> = MutableLiveData(),
@@ -28,4 +30,5 @@ class MainViewModel(
             liveData.postValue(AppState.Success(answer))
         }.start()
     }
+
 }

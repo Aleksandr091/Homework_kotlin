@@ -41,10 +41,7 @@ class WeatherListAdapter(
                         onItemClickListener.onItemClick(this)
                     }
                 }
-
             }
-
-
         }
     }
 }
