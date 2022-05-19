@@ -5,8 +5,11 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.LocationManager
+import android.location.*
+
+import android.location.Criteria.POWER_HIGH
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentWeatherListBinding
+import ru.chistov.homework.repository.City
 import ru.chistov.homework.repository.Weather
 import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
 import ru.chistov.homework.utils.KEY_SP_FILE_NAME_1
@@ -132,10 +136,27 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     private fun mRequestPermission() {
         requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
     }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CODE) {
+            for (i in permissions.indices) {
+                if (permissions[i] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation()
+                } else {
+                    explain()
+                }
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
 
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-       /* context?.let {
+       context?.let {
             val locationManager = it.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 val providerGPS =
@@ -157,8 +178,34 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                     )
                 }
             }
-        }*/
+        }
     }
+    private val locationListenerDistance = object : LocationListener{
+        override fun onLocationChanged(location: Location) {
+
+        }
+        override fun onProviderDisabled(provider: String) {
+            super.onProviderDisabled(provider)
+        }
+        override fun onProviderEnabled(provider: String) {
+            super.onProviderEnabled(provider)
+        }
+
+    }
+    private val locationListenerTime = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+
+        }
+        override fun onProviderDisabled(provider: String) {
+            super.onProviderDisabled(provider)
+        }
+        override fun onProviderEnabled(provider: String) {
+            super.onProviderEnabled(provider)
+        }
+
+    }
+
+
 
     private fun changeWeatherDataSetImage() {
         if (isRussian) {
