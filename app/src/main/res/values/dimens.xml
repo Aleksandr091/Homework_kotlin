@@ -2,9 +2,13 @@
 <resources>
 
     <dimen name="city_name_margin_top">50dp</dimen>
-    <dimen name="margin_15_dp">15dp</dimen>
+    <dimen name="margin">20dp</dimen>
     <dimen name="temperature_value_text_size">40sp</dimen>
     <dimen name="feels_like_text_size">30sp</dimen>
     <dimen name="text_size">20sp</dimen>
+    <dimen name="margin_fab">56</dimen>
+    <dimen name="margin_15_dp">15dp</dimen>
+    <dimen name="max_size_fab">56</dimen>
+
 
 </resources>

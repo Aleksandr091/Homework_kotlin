@@ -110,6 +110,7 @@ class WorkWithContentProviderFragment : Fragment() {
 
 
 
+    @SuppressLint("Range")
     private fun getContacts() {
         val contentResolver: ContentResolver = requireContext().contentResolver
         val cursor = contentResolver.query(
@@ -124,7 +125,8 @@ class WorkWithContentProviderFragment : Fragment() {
                 if (cursor.moveToPosition(i)) {
                     val columnNameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
                     val name: String = cursor.getString(columnNameIndex)
-                    val number = getNumberFromID(contentResolver,name)
+                    val contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
+                    val number = getNumberFromID(contentResolver,contactId)
 
                     binding.containerForContacts.addView(TextView(requireContext()).apply {
                         text = "$name:$number" //$number

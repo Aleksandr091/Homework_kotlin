@@ -1,6 +1,11 @@
 package ru.chistov.homework.view.weatherList
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,8 +36,6 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     private val adapter = WeatherListAdapter(this)
 
 
-
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -50,7 +53,6 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     }
 
 
-
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
     }
@@ -60,52 +62,122 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         initRecycler()
         getSP()
         changeWeatherDataSetImage()
-        if(isRussian){
+        if (isRussian) {
             viewModel.getWeatherRussian()
-        }else{
+        } else {
             viewModel.getWeatherWorld()
         }
-        setFloatingActionButton()
+        setFabCity()
         val observer = Observer<AppState> { data -> renderData(data) }
+        setupFabLocation()
         viewModel.getData().observe(viewLifecycleOwner, observer)
 
 
     }
+
     private fun getSP() {
-         isRussian = requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
+        isRussian = requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
             .getBoolean(
                 KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true
             )
     }
-    private var isRussian=true
 
-    private fun setFloatingActionButton() {
+    private var isRussian = true
+
+    private fun setFabCity() {
         binding.floatingActionButton.setOnClickListener {
-            isRussian=!isRussian
+            isRussian = !isRussian
             changeWeatherDataSetImage()
             requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, isRussian).apply()
         }
 
     }
+
+    private fun setupFabLocation() {
+        binding.FABLocation.setOnClickListener {
+            checkPermission()
+        }
+    }
+
+    private fun checkPermission() {
+        // а есть ли разрешение?
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            getLocation()
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+            // важно написать убедительную просьбу
+            explain()
+        } else {
+            mRequestPermission()
+        }
+    }
+
+    private fun explain() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(resources.getString(R.string.dialog_rationale_title))
+            .setMessage(resources.getString(R.string.dialog_rationale_message))
+            .setPositiveButton(resources.getString(R.string.dialog_rationale_give_access)) { _, _ ->
+                mRequestPermission()
+            }
+            .setNegativeButton(getString(R.string.dialog_rationale_decline)) { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
+    }
+
+    private val REQUEST_CODE = 998
+    private fun mRequestPermission() {
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+       /* context?.let {
+            val locationManager = it.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                val providerGPS =
+                    locationManager.getProvider(LocationManager.GPS_PROVIDER) // можно использовать BestProvider
+                /*providerGPS?.let{
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        10000L,
+                        0f,
+                        locationListenerTime
+                    )
+                }*/
+                providerGPS?.let {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        0,
+                        100f,
+                        locationListenerDistance
+                    )
+                }
+            }
+        }*/
+    }
+
     private fun changeWeatherDataSetImage() {
         if (isRussian) {
             viewModel.getWeatherRussian()
-            binding.floatingActionButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_russia
-                )
-            )
+            setImageDrawableFAB(R.drawable.ic_russia)
+
         } else {
             viewModel.getWeatherWorld()
-            binding.floatingActionButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_earth
-                )
-            )
+            setImageDrawableFAB(R.drawable.ic_earth)
         }
+    }
+
+    private fun setImageDrawableFAB(drawable: Int) {
+        binding.floatingActionButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                drawable
+            )
+        )
     }
 
 
@@ -152,4 +224,5 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
             })
         ).addToBackStack("").commit()
     }
+
 }
