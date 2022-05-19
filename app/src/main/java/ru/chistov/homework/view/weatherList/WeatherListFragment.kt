@@ -2,12 +2,13 @@ package ru.chistov.homework.view.weatherList
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.*
-
-import android.location.Criteria.POWER_HIGH
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,6 +26,7 @@ import ru.chistov.homework.repository.Weather
 import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
 import ru.chistov.homework.utils.KEY_SP_FILE_NAME_1
 import ru.chistov.homework.utils.KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN
+import ru.chistov.homework.utils.REQUEST_CODE_GPS
 import ru.chistov.homework.view.details.DetailsFragment
 import ru.chistov.homework.viewmodel.AppState
 import ru.chistov.homework.viewmodel.MainViewModel
@@ -78,26 +80,6 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
 
 
     }
-
-    private fun getSP() {
-        isRussian = requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
-            .getBoolean(
-                KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true
-            )
-    }
-
-    private var isRussian = true
-
-    private fun setFabCity() {
-        binding.floatingActionButton.setOnClickListener {
-            isRussian = !isRussian
-            changeWeatherDataSetImage()
-            requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE).edit()
-                .putBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, isRussian).apply()
-        }
-
-    }
-
     private fun setupFabLocation() {
         binding.FABLocation.setOnClickListener {
             checkPermission()
@@ -112,7 +94,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             getLocation()
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
             // важно написать убедительную просьбу
             explain()
         } else {
@@ -132,16 +114,17 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
             .show()
     }
 
-    private val REQUEST_CODE = 998
+
     private fun mRequestPermission() {
-        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE)
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_GPS)
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_GPS) {
             for (i in permissions.indices) {
                 if (permissions[i] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     getLocation()
@@ -154,13 +137,53 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    fun getAddressByLocation(location: Location){
+        val geocoder = Geocoder(requireContext())
+        val timeStump = System.currentTimeMillis()
+        Thread{
+            val addressText = geocoder.getFromLocation(location.latitude,location.longitude,1000000)[0].getAddressLine(0)
+            requireActivity().runOnUiThread {
+                showAddressDialog(addressText,location)
+            }
+        }.start()
+        Log.d("@@@"," прошло ${System.currentTimeMillis() - timeStump}")
+    }
+
+
+    private val locationListenerTime = object : LocationListener{
+        override fun onLocationChanged(location: Location) {
+            Log.d("@@@",location.toString())
+            getAddressByLocation(location)
+        }
+        override fun onProviderDisabled(provider: String) {
+            super.onProviderDisabled(provider)
+        }
+        override fun onProviderEnabled(provider: String) {
+            super.onProviderEnabled(provider)
+        }
+
+    }
+
+    private val locationListenerDistance = object : LocationListener{
+        override fun onLocationChanged(location: Location) {
+            Log.d("@@@",location.toString())
+            getAddressByLocation(location)
+        }
+        override fun onProviderDisabled(provider: String) {
+            super.onProviderDisabled(provider)
+        }
+        override fun onProviderEnabled(provider: String) {
+            super.onProviderEnabled(provider)
+        }
+
+    }
+
     @SuppressLint("MissingPermission")
-    private fun getLocation() {
-       context?.let {
+    private fun getLocation(){
+        context?.let {
             val locationManager = it.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                val providerGPS =
-                    locationManager.getProvider(LocationManager.GPS_PROVIDER) // можно использовать BestProvider
+            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                val providerGPS = locationManager.getProvider(LocationManager.GPS_PROVIDER) // можно использовать BestProvider
                 /*providerGPS?.let{
                     locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
@@ -169,7 +192,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
                         locationListenerTime
                     )
                 }*/
-                providerGPS?.let {
+                providerGPS?.let{
                     locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
                         0,
@@ -180,27 +203,44 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
             }
         }
     }
-    private val locationListenerDistance = object : LocationListener{
-        override fun onLocationChanged(location: Location) {
-
+    private fun showAddressDialog(address: String, location: Location) {
+        activity?.let {
+            AlertDialog.Builder(it)
+                .setTitle(getString(R.string.dialog_address_title))
+                .setMessage(address)
+                .setPositiveButton(getString(R.string.dialog_address_get_weather)) { _, _ ->
+                    onItemClick(
+                        Weather(
+                            City(
+                                address,
+                                location.latitude,
+                                location.longitude
+                            )
+                        )
+                    )
+                }
+                .setNegativeButton(getString(R.string.dialog_button_close)) { dialog, _ -> dialog.dismiss() }
+                .create()
+                .show()
         }
-        override fun onProviderDisabled(provider: String) {
-            super.onProviderDisabled(provider)
-        }
-        override fun onProviderEnabled(provider: String) {
-            super.onProviderEnabled(provider)
-        }
-
     }
-    private val locationListenerTime = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
 
-        }
-        override fun onProviderDisabled(provider: String) {
-            super.onProviderDisabled(provider)
-        }
-        override fun onProviderEnabled(provider: String) {
-            super.onProviderEnabled(provider)
+
+    private fun getSP() {
+        isRussian = requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE)
+            .getBoolean(
+                KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, true
+            )
+    }
+
+    private var isRussian = true
+
+    private fun setFabCity() {
+        binding.floatingActionButton.setOnClickListener {
+            isRussian = !isRussian
+            changeWeatherDataSetImage()
+            requireContext().getSharedPreferences(KEY_SP_FILE_NAME_1, Context.MODE_PRIVATE).edit()
+                .putBoolean(KEY_SP_FILE_NAME_1_KEY_IS_RUSSIAN, isRussian).apply()
         }
 
     }
