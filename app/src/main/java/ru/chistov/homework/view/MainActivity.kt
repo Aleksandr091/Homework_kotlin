@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ru.chistov.homework.R
+import ru.chistov.homework.lesson10.MapsFragment
 import ru.chistov.homework.lesson6.MyBroadcastReceiver
 import ru.chistov.homework.lesson6.MyService
 import ru.chistov.homework.lesson9.WorkWithContentProviderFragment
@@ -60,6 +61,15 @@ class MainActivity : AppCompatActivity() {
                 if (fragmentB == null) {
                     supportFragmentManager.beginTransaction().apply {
                         add(R.id.container, WorkWithContentProviderFragment.newInstance(), "WW")
+                            .addToBackStack("").commit()
+                    }
+                }
+            }
+            R.id.action_menu_google_maps -> {
+                val fragmentC = supportFragmentManager.findFragmentByTag("GM")
+                if (fragmentC == null) {
+                    supportFragmentManager.beginTransaction().apply {
+                        add(R.id.container, MapsFragment(), "GM")
                             .addToBackStack("").commit()
                     }
                 }
