@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.snackbar.Snackbar
 import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentMapsMainBinding
 import ru.chistov.homework.utils.REQUEST_CODE_GPS
@@ -66,12 +68,45 @@ class MapsFragment : Fragment() {
         }
     }
 
+    private fun checkPermission() {
+        // а есть ли разрешение?
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // важно написать убедительную просьбу
+            explain()
+        } else {
+            mRequestPermission()
+        }
+    }
+
+    private fun explain() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(resources.getString(R.string.dialog_rationale_title))
+            .setMessage(resources.getString(R.string.dialog_rationale_message))
+            .setPositiveButton(resources.getString(R.string.dialog_rationale_give_access)) { _, _ ->
+                mRequestPermission()
+            }
+            .setNegativeButton(getString(R.string.dialog_rationale_decline)) { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
+    }
+
+
+    private fun mRequestPermission() {
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_GPS)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
+        checkPermission()
         _binding = FragmentMapsMainBinding.inflate(inflater, container, false)
         //return inflater.inflate(R.layout.fragment_main, container, false)
         return binding.root
@@ -89,27 +124,31 @@ class MapsFragment : Fragment() {
     private fun initView() {
         binding.buttonSearch.setOnClickListener {
             val searchText = binding.searchAddress.text.toString()
-
-            val geocoder = Geocoder(requireContext())
-
-            val results = geocoder.getFromLocationName(searchText, 1)[0]
-            val location = LatLng(
-                results.latitude,
-                results.longitude
-            )
+            if (searchText.isNullOrBlank()) {
+                Snackbar.make(requireContext(),it, "неверный формат адреса", Snackbar.LENGTH_LONG).show()
+            }else{val geocoder = Geocoder(requireContext())
+                val results = geocoder.getFromLocationName(searchText, 1)[0]
 
 
-            map.addMarker(
-                MarkerOptions().position(
-                    location
-                ).title(searchText)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker))
-            )
-            map.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    location, 15f
+                val location =  LatLng(
+                    results.latitude,
+                    results.longitude
                 )
-            )
+                map.addMarker(
+                    MarkerOptions().position(
+                        location
+                    ).title(searchText)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker))
+                )
+                map.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        location, 10f
+                    )
+                )}
+
+
+
+
         }
     }
 

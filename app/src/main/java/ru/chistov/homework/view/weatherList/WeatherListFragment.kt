@@ -5,10 +5,7 @@ import android.annotation.SuppressLint
 import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -182,8 +179,10 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
     private fun getLocation(){
         context?.let {
             val locationManager = it.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_COARSE
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                val providerGPS = locationManager.getProvider(LocationManager.GPS_PROVIDER) // можно использовать BestProvider
+                val providerGPS = locationManager.getBestProvider(criteria, true)
                 /*providerGPS?.let{
                     locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
