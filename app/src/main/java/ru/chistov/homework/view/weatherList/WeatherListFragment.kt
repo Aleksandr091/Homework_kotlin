@@ -141,7 +141,7 @@ class WeatherListFragment : Fragment(), OnItemClickListener {
         val geocoder = Geocoder(requireContext())
         val timeStump = System.currentTimeMillis()
         Thread{
-            val addressText = geocoder.getFromLocation(location.latitude,location.longitude,1000000)[0].getAddressLine(0)
+            val addressText = geocoder.getFromLocation(location.latitude,location.longitude,1)[0].getAddressLine(0)
             requireActivity().runOnUiThread {
                 showAddressDialog(addressText,location)
             }
