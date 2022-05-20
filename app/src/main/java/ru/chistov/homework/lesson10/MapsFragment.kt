@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -125,30 +124,33 @@ class MapsFragment : Fragment() {
         binding.buttonSearch.setOnClickListener {
             val searchText = binding.searchAddress.text.toString()
             if (searchText.isNullOrBlank()) {
-                Snackbar.make(requireContext(),it, "неверный формат адреса", Snackbar.LENGTH_LONG).show()
-            }else{val geocoder = Geocoder(requireContext())
-                val results = geocoder.getFromLocationName(searchText, 1)[0]
+                Snackbar.make(requireContext(), it, "введите адрес", Snackbar.LENGTH_LONG).show()
+            } else {
+                val geocoder = Geocoder(requireContext())
+                val results = geocoder.getFromLocationName(searchText, 1)
 
-
-                val location =  LatLng(
-                    results.latitude,
-                    results.longitude
-                )
-                map.addMarker(
-                    MarkerOptions().position(
-                        location
-                    ).title(searchText)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker))
-                )
-                map.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        location, 10f
+                if(results.size>0){
+                    val location = LatLng(
+                    results[0].latitude,
+                    results[0].longitude
                     )
-                )}
+                    map.addMarker(
+                        MarkerOptions().position(
+                            location
+                        ).title(searchText)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker))
+                    )
+                    map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            location, 10f
+                        )
+                    )}else{
+                    Snackbar.make(requireContext(), it, "адрес не найден", Snackbar.LENGTH_LONG).show()
+                }
 
 
 
-
+            }
         }
     }
 
