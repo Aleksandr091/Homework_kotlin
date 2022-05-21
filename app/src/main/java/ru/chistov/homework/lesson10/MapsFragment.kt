@@ -20,7 +20,11 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
 import ru.chistov.homework.R
 import ru.chistov.homework.databinding.FragmentMapsMainBinding
+import ru.chistov.homework.repository.City
+import ru.chistov.homework.repository.Weather
+import ru.chistov.homework.utils.KEY_BUNDLE_WEATHER
 import ru.chistov.homework.utils.REQUEST_CODE_GPS
+import ru.chistov.homework.view.details.DetailsFragment
 
 class MapsFragment : Fragment() {
 
@@ -55,6 +59,17 @@ class MapsFragment : Fragment() {
             addMarkerToArray(it)
             drawLine()
         }
+
+        map.setOnMapClickListener {
+            val address = Geocoder(requireContext()).getFromLocation(it.latitude,it.longitude,1)[0].getAddressLine(0)
+            showWeather(Weather(
+                City(
+                    address,
+                    it.latitude,
+                    it.longitude
+                )
+            ))
+        }
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isMyLocationButtonEnabled = true
         if (ContextCompat.checkSelfPermission(
@@ -65,6 +80,18 @@ class MapsFragment : Fragment() {
             map.isMyLocationEnabled = true
 
         }
+    }
+
+    private fun showWeather(weather: Weather) {
+        requireActivity().supportFragmentManager.beginTransaction().add(
+            R.id.container,
+            DetailsFragment.newInstance(Bundle().apply {
+                putParcelable(
+                    KEY_BUNDLE_WEATHER,
+                    weather
+                )
+            })
+        ).addToBackStack("").commit()
     }
 
     private fun checkPermission() {
@@ -129,10 +156,10 @@ class MapsFragment : Fragment() {
                 val geocoder = Geocoder(requireContext())
                 val results = geocoder.getFromLocationName(searchText, 1)
 
-                if(results.size>0){
+                if (results.size > 0) {
                     val location = LatLng(
-                    results[0].latitude,
-                    results[0].longitude
+                        results[0].latitude,
+                        results[0].longitude
                     )
                     map.addMarker(
                         MarkerOptions().position(
@@ -144,10 +171,11 @@ class MapsFragment : Fragment() {
                         CameraUpdateFactory.newLatLngZoom(
                             location, 10f
                         )
-                    )}else{
-                    Snackbar.make(requireContext(), it, "адрес не найден", Snackbar.LENGTH_LONG).show()
+                    )
+                } else {
+                    Snackbar.make(requireContext(), it, "адрес не найден", Snackbar.LENGTH_LONG)
+                        .show()
                 }
-
 
 
             }
@@ -184,6 +212,7 @@ class MapsFragment : Fragment() {
                         .color(Color.RED)
                         .width(5f)
                 )
+
             }
             previousBefore = current
         }
