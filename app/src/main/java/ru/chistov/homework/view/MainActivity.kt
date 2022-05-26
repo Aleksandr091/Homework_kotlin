@@ -1,12 +1,22 @@
 package ru.chistov.homework.view
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import ru.chistov.homework.R
 import ru.chistov.homework.lesson10.MapsFragment
 import ru.chistov.homework.lesson6.MyBroadcastReceiver
@@ -18,6 +28,7 @@ import ru.chistov.homework.view.weatherList.WeatherListFragment
 
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,9 +44,17 @@ class MainActivity : AppCompatActivity() {
         })
         val receiver = MyBroadcastReceiver()
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("myaction"))
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
+        registerReceiver(receiver, IntentFilter("android.intent.action.AIRPLANE_MODE"))
         //registerReceiver(receiver, IntentFilter("myaction"))
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("mylogs_push", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("mylogs_push", "$token")
+        })
 
     }
 
